@@ -97,6 +97,14 @@ public final class SimpleTooltipUtils {
         }
     }
 
+    public static int marginUnlessGravityIs(float margin, int gravity, int excludeGravity) {
+        if (gravity == excludeGravity) {
+            return 0;
+        } else {
+            return (int) margin;
+        }
+    }
+
     public static void setX(View view, int x) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             view.setX(x);

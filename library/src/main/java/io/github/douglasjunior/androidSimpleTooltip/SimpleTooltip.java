@@ -109,6 +109,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
     private final Drawable mArrowDrawable;
     private final boolean mAnimated;
     private AnimatorSet mAnimator;
+    private final float mGlobalMargin;
     private final float mMargin;
     private final float mPadding;
     private final float mAnimationPadding;
@@ -140,6 +141,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
         mArrowHeight = builder.arrowHeight;
         mArrowDrawable = builder.arrowDrawable;
         mAnimated = builder.animated;
+        mGlobalMargin = builder.globalMargin;
         mMargin = builder.margin;
         mPadding = builder.padding;
         mAnimationPadding = builder.animationPadding;
@@ -281,6 +283,11 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
 
         LinearLayout.LayoutParams contentViewParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0);
         contentViewParams.gravity = Gravity.CENTER;
+        contentViewParams.setMargins(
+                SimpleTooltipUtils.marginUnlessGravityIs(mGlobalMargin, mGravity, Gravity.END),
+                SimpleTooltipUtils.marginUnlessGravityIs(mGlobalMargin, mGravity, Gravity.BOTTOM),
+                SimpleTooltipUtils.marginUnlessGravityIs(mGlobalMargin, mGravity, Gravity.START),
+                SimpleTooltipUtils.marginUnlessGravityIs(mGlobalMargin, mGravity, Gravity.TOP));
         mContentView.setLayoutParams(contentViewParams);
 
         if (mDismissOnInsideTouch || mDismissOnOutsideTouch)
@@ -417,6 +424,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
             if (mShowArrow) {
                 RectF achorRect = SimpleTooltipUtils.calculeRectOnScreen(mAnchorView);
                 RectF contentViewRect = SimpleTooltipUtils.calculeRectOnScreen(mContentLayout);
+                contentViewRect.inset(0, mGlobalMargin);
                 float x, y;
                 if (mArrowDirection == ArrowDrawable.TOP || mArrowDirection == ArrowDrawable.BOTTOM) {
                     x = mContentLayout.getPaddingLeft() + SimpleTooltipUtils.pxFromDp(2);
@@ -556,6 +564,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
         private boolean showArrow = true;
         private Drawable arrowDrawable;
         private boolean animated = false;
+        private float globalMargin = 0;
         private float margin = -1;
         private float padding = -1;
         private float animationPadding = -1;
@@ -904,6 +913,29 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
             return this;
         }
 
+        /**
+         * <div class="pt">Define a margin between tooltip window and surrounding window.</div>
+         *
+         * @param margin <div class="pt">size of margin in pixels</div>
+         * @return <tt>this</tt>
+         * @see Builder#globalMargin(int)
+         */
+        public Builder globalMargin(float margin) {
+            this.globalMargin = margin;
+            return this;
+        }
+
+        /**
+         * <div class="pt">Define a margin between tooltip window and surrounding window.</div>
+         *
+         * @param marginRes <div class="pt">resId of size of margin</div>
+         * @return <tt>this</tt>
+         * @see Builder#globalMargin(float)
+         */
+        public Builder globalMargin(@DimenRes int marginRes) {
+            this.globalMargin = context.getResources().getDimension(marginRes);
+            return this;
+        }
 
         /**
          * <div class="pt">Define a margem entre o Tooltip e o <tt>anchorView</tt>. Padrão é o valor de <tt>{@link R.dimen.simpletooltip_margin}</tt>.</div>
